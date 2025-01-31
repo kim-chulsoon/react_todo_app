@@ -1,7 +1,7 @@
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useDispatch, useSelector } from "react-redux";
-import { create, done } from "../store/modules/todo";
+import { create, del, done } from "../store/modules/todo";
 import { useEffect, useRef } from "react";
 import { ReduxState, Todo } from "../types/types";
 import axios from "axios";
@@ -19,8 +19,14 @@ export default function TodoList() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const nextID = useSelector((state: ReduxState) => state.todo.nextID);
-  console.log(nextID);
+  // console.log(nextID);
 
+  const clearInput = () => {
+    if (inputRef.current) {
+      inputRef.current.value = "";
+      inputRef.current.focus();
+    }
+  };
   // 할 일 추가 POST /todo
   const createTodo = async () => {
     if (inputRef.current && inputRef.current.value.trim() !== "") {
@@ -32,10 +38,7 @@ export default function TodoList() {
     await axios.post(`${process.env.REACT_APP_API_SERVER}/todo`, {
       text: inputRef.current?.value,
     });
-    if (inputRef.current) {
-      inputRef.current.value = "";
-      inputRef.current.focus();
-    }
+    clearInput();
   };
 
   // todo 상태 변경 PATCH /todo/:todoId
@@ -56,6 +59,12 @@ export default function TodoList() {
     inputRef.current?.focus();
   }, []);
 
+  // todo삭제 DELETE /todo/:todoId
+  const deleteTodo = async (todoId: number) => {
+    await axios.delete(`${process.env.REACT_APP_API_SERVER}/todo/${todoId}`);
+
+    dispatch(del(todoId));
+  };
   return (
     <section>
       <h3>할 일 목록</h3>
@@ -71,6 +80,9 @@ export default function TodoList() {
                 <FontAwesomeIcon icon={faCheck} />
               </button>
               <span>{todo.text}</span>
+              <button onClick={() => deleteTodo(todo.id)}>
+                <FontAwesomeIcon icon={faTrashCan} />
+              </button>
             </li>
           );
         })}
