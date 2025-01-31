@@ -13,7 +13,7 @@ const DONE = "todo/DONE" as const;
 const INIT = "todo/INIT" as const;
 
 // components 에서 사용될 액션 반환 함수
-export function create(payload: { id: number; text: string }) {
+export function create(payload: { id?: number; text: string }) {
   return {
     type: CREATE,
     payload: payload, // {id:number, text:String}

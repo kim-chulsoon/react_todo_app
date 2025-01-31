@@ -8,3 +8,7 @@ export interface TodoState {
   list: Todo[];
   nextID?: number;
 }
+
+export interface ReduxState {
+  todo: TodoState;
+}
